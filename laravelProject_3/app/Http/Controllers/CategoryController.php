@@ -13,7 +13,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -35,12 +36,14 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        
+        //validate data
+        $request->validate([
+            'description'=>'required',
+            'sequence'=> 'required|integer',
+          ]);
         //add data
-
         $input = $request->all();
         //print_r($input);
-
         if(Category::create($input)){
             true; //redirect
         }
@@ -48,6 +51,7 @@ class CategoryController extends Controller
             false;
         }
 
+        return redirect('/categories')->with('success', 'Category has been added');
 
         /*
         $category = new Category([
@@ -79,7 +83,9 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = Category::find($id);
+
+        return view('categories.edit', compact('category'));
     }
 
     /**
@@ -91,7 +97,19 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+       //validate data
+       $request->validate([
+        'description'=>'required',
+        'sequence'=> 'required|integer',
+      ]);
+        //add data
+        $category = Category::find($id);
+
+        $category->description = $request->get('description');
+        $category->sequence = $request->get('sequence');
+        $category->save();
+
+        return redirect('/categories')->with('success', 'Category has been updated');
     }
 
     /**
@@ -102,6 +120,8 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $category = Category::find($id);
+        $category->delete();
+        return redirect('/categories')->with('success', 'Category has been deleted Successfully');
     }
 }
